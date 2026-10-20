@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教員アプリポータル</title>
+<style>
+  :root {
+    --bg: #f4f2ee;
+    --card: #ffffff;
+    --ink: #24292f;
+    --sub: #5f6670;
+    --line: #dcd8d0;
+    --head: #2f4858;
+    --head-ink: #ffffff;
+    --koumu: #2f7f8f;
+    --jugyo: #d9822b;
+    --muted: #9aa0a6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  header {
+    background: var(--head);
+    color: var(--head-ink);
+    padding: 22px 16px 18px;
+  }
+  .head-inner { max-width: 1040px; margin: 0 auto; }
+  header h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 1.9rem); letter-spacing: .04em; }
+  header p { margin: 4px 0 0; opacity: .85; font-size: .95rem; }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 8px 16px 48px; }
+
+  .section-title {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    margin: 28px 0 4px; font-size: 1.25rem;
+  }
+  .section-title::before {
+    content: ""; width: 6px; height: 1.1em; border-radius: 3px;
+    background: var(--c); align-self: center;
+  }
+  .section-note { margin: 0 0 12px; color: var(--sub); font-size: .9rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--c);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: inherit; text-decoration: none;
+    transition: transform .12s, box-shadow .12s;
+  }
+  a.card:hover, a.card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    outline: none;
+  }
+  a.card:focus-visible { box-shadow: 0 0 0 3px var(--c); }
+  .card .top { display: flex; align-items: center; gap: 10px; }
+  .card .icon { font-size: 1.5rem; line-height: 1; }
+  .card .name { font-weight: bold; font-size: 1.08rem; }
+  .card .desc { color: var(--sub); font-size: .92rem; }
+  .card .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .tag {
+    font-size: .78rem; padding: 1px 9px; border-radius: 999px;
+    background: #f0eee9; color: var(--sub);
+  }
+  .card.disabled { border-left-color: var(--muted); opacity: .75; cursor: default; }
+  .card.disabled .tag.warn { background: #fdecea; color: #a33; }
+
+  .hiroba {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: #fff7e8; border: 1px solid #f1d9a8; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 12px;
+  }
+  .hiroba p { margin: 0; flex: 1 1 260px; font-size: .92rem; }
+  .hiroba a {
+    background: var(--jugyo); color: #fff; text-decoration: none; font-weight: bold;
+    padding: 8px 18px; border-radius: 999px; white-space: nowrap;
+  }
+
+  .grade-row { margin: 14px 0 6px; font-weight: bold; color: var(--sub); font-size: .95rem; }
+
+  footer { max-width: 1040px; margin: 0 auto; padding: 0 16px 32px; color: var(--sub); font-size: .82rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <h1>教員アプリポータル</h1>
+    <p>校務や授業で使うアプリをここから開けます。</p>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<footer id="footer"></footer>
+
+<script>
+/* ===== 編集ここから =====
+   アプリを追加するときは、該当する一覧に1行加えてください。
+   url を "" にすると「公開URL未設定」として表示されます。 */
+
+const UPDATED = "2026-10-20";
+
+// 校務ツール
+const KOUMU = [
+  { icon: "🗓️", name: "年間行事予定表",       desc: "年間行事の作成と、時数集計・調整授業時数の試算。", url: "https://nenkan-schedule.vercel.app/",       tags: ["教務"] },
+  { icon: "📝", name: "週案作成サポート",     desc: "専科教員の週案を作成。振替・補欠の選択にも対応。", url: "https://syuan-build.vercel.app/",          tags: ["専科"] },
+  { icon: "📊", name: "時間割集計",           desc: "Word時間割から学年別・教科別の時数を集計し、時数集計表Excelへ一括書き込み。", url: "", tags: ["教務"] },
+  { icon: "🌸", name: "さくら週予定 作成",     desc: "A時間割・B時間割から週予定シートを自動生成。",    url: "", tags: ["特別支援"] },
+  { icon: "👥", name: "学級編制",             desc: "新1年生の学級編制。Excel取込・自動編制・名簿印刷。データはブラウザに保存しません。", url: "https://siro9ma29.github.io/gakkyu-hensei/", tags: ["1年"] },
+];
+
+// 授業で使うアプリ（児童向け）
+const PAGES_BASE = "https://siro9ma29.github.io/";
+const JUGYO = [
+  { grade: 2, icon: "✖️", name: "九九チャレンジ",               unit: "かけ算九九",       repo: "99-charenge" },
+  { grade: 4, icon: "📐", name: "分度器",                       unit: "角の大きさ",       repo: "bundoki" },
+  { grade: 4, icon: "🔟", name: "小数点のしくみ（10倍・1/10）",  unit: "小数のしくみ",     repo: "syosuten-idou" },
+  { grade: 4, icon: "📏", name: "小数のしくみ（数直線）",        unit: "小数のしくみ",     repo: "syosu-sutyokusen" },
+  { grade: 4, icon: "≒",  name: "がい数",                       unit: "がい数とその計算", repo: "gaisu" },
+  { grade: 4, icon: "➗", name: "わり算（わる数1けた）",          unit: "わり算の筆算",     repo: "warizan" },
+  { grade: 4, icon: "➗", name: "わり算（わる数2けた以上）",      unit: "わり算の筆算",     repo: "warizan2" },
+  { grade: 4, icon: "⚖️", name: "単位換算",                     unit: "かんたんな単位",   repo: "tanni-kansan" },
+  { grade: 5, icon: "🧺", name: "倍数コレクター",                unit: "倍数と約数",       repo: "baisu-training" },
+  { grade: 5, icon: "🧱", name: "公倍数さがし",                  unit: "倍数と約数",       repo: "koubaisu-search" },
+  { grade: 5, icon: "🔢", name: "小数のわり算",                  unit: "小数のわり算",     repo: "syosu-warizan" },
+];
+/* ===== 編集ここまで ===== */
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function koumuCard(a) {
+  const tags = a.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("");
+  const inner = `
+    <span class="top"><span class="icon" aria-hidden="true">${a.icon}</span><span class="name">${esc(a.name)}</span></span>
+    <span class="desc">${esc(a.desc)}</span>
+    <span class="meta">${tags}${a.url ? "" : '<span class="tag warn">公開URL未設定</span>'}</span>`;
+  return a.url
+    ? `<a class="card" href="${esc(a.url)}" target="_blank" rel="noopener">${inner}</a>`
+    : `<div class="card disabled" aria-disabled="true">${inner}</div>`;
+}
+
+function jugyoCard(a) {
+  return `<a class="card" href="${esc(PAGES_BASE + a.repo + "/")}" target="_blank" rel="noopener">
+    <span class="top"><span class="icon" aria-hidden="true">${a.icon}</span><span class="name">${esc(a.name)}</span></span>
+    <span class="meta"><span class="tag">${a.grade}年</span><span class="tag">${esc(a.unit)}</span></span>
+  </a>`;
+}
+
+function render() {
+  const grades = [...new Set(JUGYO.map(a => a.grade))].sort((x, y) => x - y);
+  document.getElementById("main").innerHTML = `
+    <section style="--c:var(--koumu)">
+      <h2 class="section-title">校務ツール</h2>
+      <p class="section-note">児童の個人情報を扱うアプリは、データを各自のパソコン内で保存・管理してください。</p>
+      <div class="grid">${KOUMU.map(koumuCard).join("")}</div>
+    </section>
+
+    <section style="--c:var(--jugyo)">
+      <h2 class="section-title">授業で使うアプリ</h2>
+      <div class="hiroba">
+        <p>児童に配るときは「さんすう れんしゅうひろば」から。アプリごとのQRコードを大きく表示できます。</p>
+        <a href="${PAGES_BASE}sansu-hiroba/" target="_blank" rel="noopener">さんすうひろばを開く</a>
+      </div>
+      ${grades.map(g => `
+        <div class="grade-row">${g}年</div>
+        <div class="grid">${JUGYO.filter(a => a.grade === g).map(jugyoCard).join("")}</div>
+      `).join("")}
+    </section>`;
+  document.getElementById("footer").textContent = `最終更新：${UPDATED}`;
+}
+
+render();
+</script>
+</body>
+</html>

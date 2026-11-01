@@ -112,7 +112,7 @@
    アプリを追加するときは、該当する一覧に1行加えてください。
    url を "" にすると「公開URL未設定」として表示されます。 */
 
-const UPDATED = "2026-10-26";
+const UPDATED = "2026-11-02";
 
 // 校務ツール
 const KOUMU = [
@@ -129,6 +129,8 @@ const KOUMU = [
 // 授業で使うアプリ（児童向け）
 const PAGES_BASE = "https://siro9ma29.github.io/";
 const JUGYO = [
+  { grade: 0, icon: "💡", name: "ひかる じゅんばん",             unit: "おぼえる力（ワーキングメモリ）", repo: "sansu-hiroba/hikaru-junban" },
+  { grade: 0, icon: "🍎", name: "どっちが おおい？",             unit: "数の感覚（量の比較）",       repo: "sansu-hiroba/dochi-ooi" },
   { grade: 1, icon: "➕", name: "たすひくチャレンジ",           unit: "たし算・ひき算",   repo: "tasuhiku-challenge" },
   { grade: 2, icon: "✖️", name: "九九チャレンジ",               unit: "かけ算九九",       repo: "99-charenge" },
   { grade: 3, icon: "⚔️", name: "マス・モンスターズ",           unit: "かけ算の筆算",     repo: "kakezan-hissan" },
@@ -162,7 +164,7 @@ function koumuCard(a) {
 function jugyoCard(a) {
   return `<a class="card" href="${esc(PAGES_BASE + a.repo + "/")}" target="_blank" rel="noopener">
     <span class="top"><span class="icon" aria-hidden="true">${a.icon}</span><span class="name">${esc(a.name)}</span></span>
-    <span class="meta"><span class="tag">${a.grade}年</span><span class="tag">${esc(a.unit)}</span></span>
+    <span class="meta"><span class="tag">${a.grade === 0 ? "5さい〜" : a.grade + "年"}</span><span class="tag">${esc(a.unit)}</span></span>
   </a>`;
 }
 
@@ -182,7 +184,7 @@ function render() {
         <a href="${PAGES_BASE}sansu-hiroba/" target="_blank" rel="noopener">さんすうひろばを開く</a>
       </div>
       ${grades.map(g => `
-        <div class="grade-row">${g}年</div>
+        <div class="grade-row">${g === 0 ? "あたまのたいそう（5さい〜・認知能力）" : g + "年"}</div>
         <div class="grid">${JUGYO.filter(a => a.grade === g).map(jugyoCard).join("")}</div>
       `).join("")}
     </section>`;

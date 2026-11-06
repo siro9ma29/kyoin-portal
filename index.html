@@ -165,7 +165,7 @@ function koumuCard(a) {
 function jugyoCard(a) {
   return `<a class="card" href="${esc(PAGES_BASE + a.repo + "/")}" target="_blank" rel="noopener">
     <span class="top"><span class="icon" aria-hidden="true">${a.icon}</span><span class="name">${esc(a.name)}</span></span>
-    <span class="meta"><span class="tag">${a.grade === 0 ? "5さい〜" : a.grade + "年"}</span><span class="tag">${esc(a.unit)}</span></span>
+    <span class="meta">${a.grade === 0 ? "" : `<span class="tag">${a.grade}年</span>`}<span class="tag">${esc(a.unit)}</span></span>
   </a>`;
 }
 
@@ -185,7 +185,7 @@ function render() {
         <a href="${PAGES_BASE}sansu-hiroba/" target="_blank" rel="noopener">さんすうひろばを開く</a>
       </div>
       ${grades.map(g => `
-        <div class="grade-row">${g === 0 ? "あたまのたいそう（5さい〜・認知能力）" : g + "年"}</div>
+        <div class="grade-row">${g === 0 ? "あたまのたいそう（認知能力）" : g + "年"}</div>
         <div class="grid">${JUGYO.filter(a => a.grade === g).map(jugyoCard).join("")}</div>
       `).join("")}
     </section>`;

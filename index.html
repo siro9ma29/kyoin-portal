@@ -112,7 +112,7 @@
    アプリを追加するときは、該当する一覧に1行加えてください。
    url を "" にすると「公開URL未設定」として表示されます。 */
 
-const UPDATED = "2026-11-17";
+const UPDATED = "2026-11-18";
 
 // 校務ツール
 const KOUMU = [
@@ -128,10 +128,13 @@ const KOUMU = [
 ];
 
 // 授業で使うアプリ（児童向け）
+// grade：0＝あたまのたいそう／"kokugo"＝国語（全学年）／1〜6＝算数の学年
+// teacher: true をつけると「電子黒板で使用」と表示します。
 const PAGES_BASE = "https://siro9ma29.github.io/";
 const JUGYO = [
   { grade: 0, icon: "💡", name: "ひかる じゅんばん",             unit: "おぼえる力（ワーキングメモリ）", repo: "sansu-hiroba/hikaru-junban" },
   { grade: 0, icon: "🍎", name: "どっちが おおい？",             unit: "数の感覚（量の比較）",       repo: "sansu-hiroba/dochi-ooi" },
+  { grade: "kokugo", icon: "📖", name: "よみとく5分",            unit: "読解トレーニング（1〜6年）", repo: "sansu-hiroba/yomitoku5", teacher: true },
   { grade: 1, icon: "➕", name: "たすひくチャレンジ",           unit: "たし算・ひき算",   repo: "tasuhiku-challenge" },
   { grade: 1, icon: "🍉", name: "かずスイカ",                   unit: "5・10の合成／大きな数",  repo: "sansu-hiroba/kazu-suika" },
   { grade: 2, icon: "✖️", name: "九九チャレンジ",               unit: "かけ算九九",       repo: "99-charenge" },
@@ -168,12 +171,14 @@ function koumuCard(a) {
 function jugyoCard(a) {
   return `<a class="card" href="${esc(PAGES_BASE + a.repo + "/")}" target="_blank" rel="noopener">
     <span class="top"><span class="icon" aria-hidden="true">${a.icon}</span><span class="name">${esc(a.name)}</span></span>
-    <span class="meta">${a.grade === 0 ? "" : `<span class="tag">${a.grade}年</span>`}<span class="tag">${esc(a.unit)}</span></span>
+    <span class="meta">${typeof a.grade !== "number" || a.grade === 0 ? "" : `<span class="tag">${a.grade}年</span>`}<span class="tag">${esc(a.unit)}</span>${a.teacher ? '<span class="tag">電子黒板で使用</span>' : ""}</span>
   </a>`;
 }
 
 function render() {
-  const grades = [...new Set(JUGYO.map(a => a.grade))].sort((x, y) => x - y);
+  const order = g => g === 0 ? 0 : g === "kokugo" ? 0.5 : g;
+  const rowLabel = g => g === 0 ? "あたまのたいそう（認知能力）" : g === "kokugo" ? "国語" : "算数 " + g + "年";
+  const grades = [...new Set(JUGYO.map(a => a.grade))].sort((x, y) => order(x) - order(y));
   document.getElementById("main").innerHTML = `
     <section style="--c:var(--koumu)">
       <h2 class="section-title">校務ツール</h2>
@@ -184,11 +189,11 @@ function render() {
     <section style="--c:var(--jugyo)">
       <h2 class="section-title">授業で使うアプリ</h2>
       <div class="hiroba">
-        <p>児童に配るときは「さんすう れんしゅうひろば」から。アプリごとのQRコードを大きく表示できます。</p>
-        <a href="${PAGES_BASE}sansu-hiroba/" target="_blank" rel="noopener">さんすうひろばを開く</a>
+        <p>児童に配るときは「学習ひろば」から。アプリごとのQRコードを大きく表示できます。</p>
+        <a href="${PAGES_BASE}sansu-hiroba/" target="_blank" rel="noopener">学習ひろばを開く</a>
       </div>
       ${grades.map(g => `
-        <div class="grade-row">${g === 0 ? "あたまのたいそう（認知能力）" : g + "年"}</div>
+        <div class="grade-row">${rowLabel(g)}</div>
         <div class="grid">${JUGYO.filter(a => a.grade === g).map(jugyoCard).join("")}</div>
       `).join("")}
     </section>`;
